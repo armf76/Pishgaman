@@ -1,0 +1,36 @@
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
+.link {
+  color: white;
+  text-decoration: none;
+  font-size: 17px;
+  font-weight: 500;
+  transition: all 0.25s ease;
+  position: relative;
+}
+
+.link:hover {
+  color: #d4af37;
+}
+
+.link::after {
+  content: "";
+  position: absolute;
+  bottom: -6px;
+  right: 0;
+
+  width: 0;
+  height: 2px;
+
+  background: #d4af37;
+
+  transition: width 0.25s ease;
+}
+
+.link:hover::after {
+  width: 100%;
+}

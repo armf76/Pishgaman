@@ -1,0 +1,13 @@
+.layout{
+    min-height:100vh;
+    background:var(--color-background);
+}
+
+.contentArea{
+    display:flex;
+}
+
+.main{
+    flex:1;
+    padding:32px;
+}

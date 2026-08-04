@@ -1,0 +1,57 @@
+.actions{
+
+display:flex;
+
+align-items:center;
+
+gap:16px;
+
+}
+
+.login{
+
+padding:10px 20px;
+
+border:2px solid white;
+
+border-radius:10px;
+
+color:white;
+
+transition:.25s;
+
+font-weight:600;
+
+}
+
+.login:hover{
+
+background:white;
+
+color:#0F4C81;
+
+}
+
+.primary{
+
+padding:12px 24px;
+
+background:#D4AF37;
+
+border-radius:10px;
+
+color:#222;
+
+font-weight:700;
+
+transition:.25s;
+
+}
+
+.primary:hover{
+
+transform:translateY(-2px);
+
+box-shadow:0 8px 18px rgba(0,0,0,.18);
+
+}
