@@ -1,0 +1,88 @@
+:root {
+  /* ========= COLORS ========= */
+
+  --color-primary: #0F4C81;
+  --color-primary-light: #2B6EA5;
+  --color-primary-dark: #08385F;
+
+  --color-secondary: #D4AF37;
+
+  --color-success: #2E8B57;
+  --color-warning: #F5A623;
+  --color-danger: #D64545;
+
+  --color-bg: #F5F7FA;
+  --color-surface: #FFFFFF;
+
+  --color-text: #1F2937;
+  --color-text-light: #6B7280;
+
+  --color-border: #E5E7EB;
+
+  /* ========= SHADOW ========= */
+
+  --shadow-sm:
+      0 2px 6px rgba(0,0,0,.06);
+
+  --shadow-md:
+      0 8px 20px rgba(0,0,0,.08);
+
+  --shadow-lg:
+      0 15px 40px rgba(0,0,0,.12);
+
+  /* ========= RADIUS ========= */
+
+  --radius-sm:8px;
+  --radius-md:14px;
+  --radius-lg:20px;
+  --radius-xl:28px;
+
+  /* ========= SPACING ========= */
+
+  --space-1:4px;
+  --space-2:8px;
+  --space-3:12px;
+  --space-4:16px;
+  --space-5:24px;
+  --space-6:32px;
+  --space-7:48px;
+  --space-8:64px;
+  --space-9:96px;
+
+  /* ========= FONT ========= */
+
+  --font-display:
+      "Vazirmatn",
+      sans-serif;
+
+  --font-body:
+      "Vazirmatn",
+      sans-serif;
+
+  /* ========= FONT SIZE ========= */
+
+  --text-xs:.75rem;
+  --text-sm:.875rem;
+  --text-base:1rem;
+  --text-lg:1.125rem;
+  --text-xl:1.25rem;
+  --text-2xl:1.5rem;
+  --text-3xl:2rem;
+  --text-4xl:2.75rem;
+  --text-5xl:3.5rem;
+
+  /* ========= CONTAINER ========= */
+
+  --container-width:1280px;
+
+  /* ========= HEADER ========= */
+
+  --header-height:84px;
+
+  /* ========= TRANSITIONS ========= */
+
+  --transition-fast:.2s ease;
+
+  --transition:
+      .35s ease;
+}

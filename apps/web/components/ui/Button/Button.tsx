@@ -1,32 +1,28 @@
-type ButtonVariant =
-  | "primary"
-  | "secondary"
-  | "outline"
-  | "danger";
+import React from "react";
+import styles from "./Button.module.css";
 
-interface ButtonProps {
+type ButtonVariant = "primary" | "secondary" | "outline";
+
+type ButtonProps = {
   children: React.ReactNode;
   variant?: ButtonVariant;
   onClick?: () => void;
   type?: "button" | "submit" | "reset";
-  disabled?: boolean;
-}
-
-import styles from "./Button.module.css";
+  className?: string;
+};
 
 export default function Button({
   children,
   variant = "primary",
   onClick,
   type = "button",
-  disabled = false,
+  className = "",
 }: ButtonProps) {
   return (
     <button
-      className={`${styles.button} ${styles[variant]}`}
       type={type}
       onClick={onClick}
-      disabled={disabled}
+      className={`${styles.button} ${styles[variant]} ${className}`}
     >
       {children}
     </button>
