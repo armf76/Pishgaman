@@ -1,3 +1,4 @@
+import Process from "../components/home/Process";
 import Statistics from "../components/home/Statistics";
 import Header from "../components/layout/Header";
 import Footer from "../components/layout/Footer";
@@ -16,6 +17,7 @@ export default function HomePage() {
       <Hero />
       <QuickServices />
       <Statistics />
+      <Process />
       <Footer />
     </main>
   );
