@@ -4,6 +4,185 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+}
 
-  url = env("DATABASE_URL")
+enum PartyType {
+  PERSON
+  ORGANIZATION
+}
+
+enum PartyStatus {
+  ACTIVE
+  INACTIVE
+  DELETED
+}
+
+enum PartyRoleType {
+  APPLICANT
+  OWNER
+  ATTORNEY
+  EXPERT
+  EMPLOYEE
+  NOTARY
+  ADMIN
+}
+
+enum ContactType {
+  MOBILE
+  PHONE
+  EMAIL
+  WEBSITE
+}
+
+enum DocumentType {
+  NATIONAL_CARD
+  BIRTH_CERTIFICATE
+  PASSPORT
+  COMPANY_REGISTRATION
+  POWER_OF_ATTORNEY
+}
+
+model Party {
+  id        String      @id @default(uuid())
+  partyType PartyType
+  status    PartyStatus @default(ACTIVE)
+
+  displayName String
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  person       Person?
+  organization Organization?
+
+  contacts     Contact[]
+  addresses    Address[]
+  roles        PartyRole[]
+  documents    IdentityDocument[]
+  bankAccounts BankAccount[]
+
+  @@index([displayName])
+}
+
+model Person {
+  id String @id @default(uuid())
+
+  partyId String @unique
+  party   Party  @relation(fields: [partyId], references: [id], onDelete: Cascade)
+
+  firstName  String
+  lastName   String
+  fatherName String?
+
+  nationalCode String    @unique
+  birthDate    DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Organization {
+  id String @id @default(uuid())
+
+  partyId String @unique
+  party   Party  @relation(fields: [partyId], references: [id], onDelete: Cascade)
+
+  companyName String
+
+  registrationNumber String  @unique
+  nationalId         String? @unique
+  economicCode       String? @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PartyRole {
+  id String @id @default(uuid())
+
+  partyId String
+  party   Party  @relation(fields: [partyId], references: [id], onDelete: Cascade)
+
+  role PartyRoleType
+
+  active Boolean @default(true)
+
+  createdAt DateTime @default(now())
+
+  @@unique([partyId, role])
+}
+
+model Contact {
+  id String @id @default(uuid())
+
+  partyId String
+  party   Party  @relation(fields: [partyId], references: [id], onDelete: Cascade)
+
+  type ContactType
+
+  value String
+
+  primary  Boolean @default(false)
+  verified Boolean @default(false)
+
+  createdAt DateTime @default(now())
+
+  @@index([partyId])
+}
+
+model Address {
+  id String @id @default(uuid())
+
+  partyId String
+  party   Party  @relation(fields: [partyId], references: [id], onDelete: Cascade)
+
+  province String
+  city     String
+
+  postalCode String?
+
+  address String
+
+  latitude  Float?
+  longitude Float?
+
+  createdAt DateTime @default(now())
+}
+
+model IdentityDocument {
+  id String @id @default(uuid())
+
+  partyId String
+  party   Party  @relation(fields: [partyId], references: [id], onDelete: Cascade)
+
+  type DocumentType
+
+  number String
+
+  issueDate  DateTime?
+  expireDate DateTime?
+
+  filePath String?
+
+  createdAt DateTime @default(now())
+
+  @@index([partyId])
+}
+
+model BankAccount {
+  id String @id @default(uuid())
+
+  partyId String
+  party   Party  @relation(fields: [partyId], references: [id], onDelete: Cascade)
+
+  bankName String
+
+  iban String @unique
+
+  cardNumber String?
+
+  ownerName String
+
+  createdAt DateTime @default(now())
 }

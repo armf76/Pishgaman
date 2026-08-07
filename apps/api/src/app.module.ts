@@ -1,10 +1,19 @@
+import { ApplicantModule } from './modules/applicant/applicant.module';
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+
+import { PrismaModule } from './common/prisma/prisma.module';
+
+import { PartyModule } from './modules/party/party.module';
+import { PersonModule } from './modules/person/person.module';
+import { OrganizationModule } from './modules/organization/organization.module';
 
 @Module({
-  imports: [],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [
+    PrismaModule,
+    PartyModule,
+    PersonModule,
+    OrganizationModule,
+    ApplicantModule,
+  ],
 })
 export class AppModule {}
