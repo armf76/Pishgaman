@@ -42,6 +42,54 @@ enum DocumentType {
   POWER_OF_ATTORNEY
 }
 
+enum CaseStatus {
+  DRAFT
+  SUBMITTED
+  UNDER_REVIEW
+  NEED_DOCUMENT
+  APPROVED
+  REJECTED
+  COMPLETED
+  CANCELLED
+}
+
+enum CaseDocumentStatus {
+  REQUIRED
+  UPLOADED
+  VERIFIED
+  REJECTED
+}
+
+enum CaseDocumentType {
+  NATIONAL_CARD
+  BIRTH_CERTIFICATE
+  PASSPORT
+  OWNERSHIP_DOCUMENT
+  POWER_OF_ATTORNEY
+  COMPANY_DOCUMENT
+  OTHER
+}
+
+enum CaseAuditAction {
+  CREATED
+  UPDATED
+  SUBMITTED
+  REVIEWED
+  DOCUMENT_REQUESTED
+  RESUBMITTED
+  APPROVED
+  REJECTED
+  COMPLETED
+  CANCELLED
+  DOCUMENT_CREATED
+  DOCUMENT_UPDATED
+  DOCUMENT_UPLOADED
+  DOCUMENT_VERIFIED
+  DOCUMENT_REJECTED
+  DOCUMENT_DELETED
+  APPROVAL_BLOCKED
+}
+
 model Party {
   id        String      @id @default(uuid())
   partyType PartyType
@@ -61,6 +109,8 @@ model Party {
   roles        PartyRole[]
   documents    IdentityDocument[]
   bankAccounts BankAccount[]
+
+  cases Case[]
 
   @@index([displayName])
 }
@@ -119,8 +169,7 @@ model Contact {
   partyId String
   party   Party  @relation(fields: [partyId], references: [id], onDelete: Cascade)
 
-  type ContactType
-
+  type  ContactType
   value String
 
   primary  Boolean @default(false)
@@ -148,6 +197,8 @@ model Address {
   longitude Float?
 
   createdAt DateTime @default(now())
+
+  @@index([partyId])
 }
 
 model IdentityDocument {
@@ -185,4 +236,83 @@ model BankAccount {
   ownerName String
 
   createdAt DateTime @default(now())
+
+  @@index([partyId])
+}
+
+model Case {
+  id String @id @default(uuid())
+
+  caseNumber String @unique
+
+  applicantPartyId String
+  applicant        Party  @relation(fields: [applicantPartyId], references: [id])
+
+  title       String
+  description String?
+
+  status CaseStatus @default(DRAFT)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  caseDocuments CaseDocument[]
+  audits        CaseAudit[]
+
+  @@index([caseNumber])
+  @@index([status])
+  @@index([applicantPartyId])
+}
+
+model CaseDocument {
+  id String @id @default(uuid())
+
+  caseId String
+  case   Case   @relation(fields: [caseId], references: [id], onDelete: Cascade)
+
+  type  CaseDocumentType
+  title String
+
+  status CaseDocumentStatus @default(REQUIRED)
+
+  filePath        String?
+  rejectionReason String?
+
+  uploadedAt DateTime?
+  verifiedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  audits CaseAudit[]
+
+  @@unique([caseId, type])
+  @@index([caseId])
+  @@index([status])
+}
+
+model CaseAudit {
+  id String @id @default(uuid())
+
+  caseId String
+  case   Case   @relation(fields: [caseId], references: [id], onDelete: Cascade)
+
+  action CaseAuditAction
+
+  fromStatus CaseStatus?
+  toStatus   CaseStatus?
+
+  documentId String?
+  document   CaseDocument? @relation(fields: [documentId], references: [id], onDelete: SetNull)
+
+  description String?
+
+  metadata Json?
+
+  createdAt DateTime @default(now())
+
+  @@index([caseId])
+  @@index([action])
+  @@index([documentId])
+  @@index([createdAt])
 }

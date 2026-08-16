@@ -17,10 +17,9 @@
 
     "sourceMap": true,
 
-    "incremental": true,
+    "incremental": false,
 
     "skipLibCheck": true,
-
     "forceConsistentCasingInFileNames": true,
 
     "resolveJsonModule": true,
@@ -33,10 +32,10 @@
   ],
 
   "exclude": [
-  "node_modules",
-  "dist",
-  "test",
-  "**/*.spec.ts",
-  "**/*.e2e-spec.ts"
-]
+    "node_modules",
+    "dist",
+    "test",
+    "**/*.spec.ts",
+    "**/*.e2e-spec.ts"
+  ]
 }

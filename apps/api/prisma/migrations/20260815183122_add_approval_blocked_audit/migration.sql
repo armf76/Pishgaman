@@ -1,0 +1,2 @@
+-- AlterEnum
+ALTER TYPE "CaseAuditAction" ADD VALUE 'APPROVAL_BLOCKED';
