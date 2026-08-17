@@ -1,5 +1,8 @@
 import { Module } from '@nestjs/common';
 
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+
 import { PrismaModule } from './common/prisma/prisma.module';
 
 import { ApplicantModule } from './modules/applicant/applicant.module';
@@ -17,5 +20,7 @@ import { PersonModule } from './modules/person/person.module';
     ApplicantModule,
     CaseModule,
   ],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}

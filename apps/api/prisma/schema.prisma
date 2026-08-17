@@ -6,6 +6,174 @@ datasource db {
   provider = "postgresql"
 }
 
+model Party {
+  id           String             @id @default(uuid())
+  partyType    PartyType
+  status       PartyStatus        @default(ACTIVE)
+  displayName  String
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+  deletedAt    DateTime?
+  addresses    Address[]
+  bankAccounts BankAccount[]
+  cases        Case[]
+  contacts     Contact[]
+  documents    IdentityDocument[]
+  organization Organization?
+  roles        PartyRole[]
+  person       Person?
+
+  @@index([displayName])
+}
+
+model Person {
+  id           String    @id @default(uuid())
+  partyId      String    @unique
+  firstName    String
+  lastName     String
+  fatherName   String?
+  nationalCode String    @unique
+  birthDate    DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  party        Party     @relation(fields: [partyId], references: [id], onDelete: Cascade)
+}
+
+model Organization {
+  id                 String   @id @default(uuid())
+  partyId            String   @unique
+  companyName        String
+  registrationNumber String   @unique
+  nationalId         String?  @unique
+  economicCode       String?  @unique
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  party              Party    @relation(fields: [partyId], references: [id], onDelete: Cascade)
+}
+
+model PartyRole {
+  id        String        @id @default(uuid())
+  partyId   String
+  role      PartyRoleType
+  active    Boolean       @default(true)
+  createdAt DateTime      @default(now())
+  party     Party         @relation(fields: [partyId], references: [id], onDelete: Cascade)
+
+  @@unique([partyId, role])
+}
+
+model Contact {
+  id        String      @id @default(uuid())
+  partyId   String
+  type      ContactType
+  value     String
+  primary   Boolean     @default(false)
+  verified  Boolean     @default(false)
+  createdAt DateTime    @default(now())
+  party     Party       @relation(fields: [partyId], references: [id], onDelete: Cascade)
+
+  @@index([partyId])
+}
+
+model Address {
+  id         String   @id @default(uuid())
+  partyId    String
+  province   String
+  city       String
+  postalCode String?
+  address    String
+  latitude   Float?
+  longitude  Float?
+  createdAt  DateTime @default(now())
+  party      Party    @relation(fields: [partyId], references: [id], onDelete: Cascade)
+
+  @@index([partyId])
+}
+
+model IdentityDocument {
+  id         String       @id @default(uuid())
+  partyId    String
+  type       DocumentType
+  number     String
+  issueDate  DateTime?
+  expireDate DateTime?
+  filePath   String?
+  createdAt  DateTime     @default(now())
+  party      Party        @relation(fields: [partyId], references: [id], onDelete: Cascade)
+
+  @@index([partyId])
+}
+
+model BankAccount {
+  id         String   @id @default(uuid())
+  partyId    String
+  bankName   String
+  iban       String   @unique
+  cardNumber String?
+  ownerName  String
+  createdAt  DateTime @default(now())
+  party      Party    @relation(fields: [partyId], references: [id], onDelete: Cascade)
+
+  @@index([partyId])
+}
+
+model Case {
+  id               String         @id @default(uuid())
+  caseNumber       String         @unique
+  applicantPartyId String
+  title            String
+  description      String?
+  status           CaseStatus     @default(DRAFT)
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  applicant        Party          @relation(fields: [applicantPartyId], references: [id])
+  audits           CaseAudit[]
+  caseDocuments    CaseDocument[]
+
+  @@index([caseNumber])
+  @@index([status])
+  @@index([applicantPartyId])
+}
+
+model CaseDocument {
+  id              String             @id @default(uuid())
+  caseId          String
+  type            CaseDocumentType
+  title           String
+  status          CaseDocumentStatus @default(REQUIRED)
+  filePath        String?
+  rejectionReason String?
+  uploadedAt      DateTime?
+  verifiedAt      DateTime?
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  audits          CaseAudit[]
+  case            Case               @relation(fields: [caseId], references: [id], onDelete: Cascade)
+
+  @@unique([caseId, type])
+  @@index([caseId])
+  @@index([status])
+}
+
+model CaseAudit {
+  id          String          @id @default(uuid())
+  caseId      String
+  action      CaseAuditAction
+  fromStatus  CaseStatus?
+  toStatus    CaseStatus?
+  documentId  String?
+  description String?
+  metadata    Json?
+  createdAt   DateTime        @default(now())
+  case        Case            @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  document    CaseDocument?   @relation(fields: [documentId], references: [id])
+
+  @@index([caseId])
+  @@index([action])
+  @@index([documentId])
+  @@index([createdAt])
+}
+
 enum PartyType {
   PERSON
   ORGANIZATION
@@ -88,231 +256,4 @@ enum CaseAuditAction {
   DOCUMENT_REJECTED
   DOCUMENT_DELETED
   APPROVAL_BLOCKED
-}
-
-model Party {
-  id        String      @id @default(uuid())
-  partyType PartyType
-  status    PartyStatus @default(ACTIVE)
-
-  displayName String
-
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  deletedAt DateTime?
-
-  person       Person?
-  organization Organization?
-
-  contacts     Contact[]
-  addresses    Address[]
-  roles        PartyRole[]
-  documents    IdentityDocument[]
-  bankAccounts BankAccount[]
-
-  cases Case[]
-
-  @@index([displayName])
-}
-
-model Person {
-  id String @id @default(uuid())
-
-  partyId String @unique
-  party   Party  @relation(fields: [partyId], references: [id], onDelete: Cascade)
-
-  firstName  String
-  lastName   String
-  fatherName String?
-
-  nationalCode String    @unique
-  birthDate    DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Organization {
-  id String @id @default(uuid())
-
-  partyId String @unique
-  party   Party  @relation(fields: [partyId], references: [id], onDelete: Cascade)
-
-  companyName String
-
-  registrationNumber String  @unique
-  nationalId         String? @unique
-  economicCode       String? @unique
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model PartyRole {
-  id String @id @default(uuid())
-
-  partyId String
-  party   Party  @relation(fields: [partyId], references: [id], onDelete: Cascade)
-
-  role PartyRoleType
-
-  active Boolean @default(true)
-
-  createdAt DateTime @default(now())
-
-  @@unique([partyId, role])
-}
-
-model Contact {
-  id String @id @default(uuid())
-
-  partyId String
-  party   Party  @relation(fields: [partyId], references: [id], onDelete: Cascade)
-
-  type  ContactType
-  value String
-
-  primary  Boolean @default(false)
-  verified Boolean @default(false)
-
-  createdAt DateTime @default(now())
-
-  @@index([partyId])
-}
-
-model Address {
-  id String @id @default(uuid())
-
-  partyId String
-  party   Party  @relation(fields: [partyId], references: [id], onDelete: Cascade)
-
-  province String
-  city     String
-
-  postalCode String?
-
-  address String
-
-  latitude  Float?
-  longitude Float?
-
-  createdAt DateTime @default(now())
-
-  @@index([partyId])
-}
-
-model IdentityDocument {
-  id String @id @default(uuid())
-
-  partyId String
-  party   Party  @relation(fields: [partyId], references: [id], onDelete: Cascade)
-
-  type DocumentType
-
-  number String
-
-  issueDate  DateTime?
-  expireDate DateTime?
-
-  filePath String?
-
-  createdAt DateTime @default(now())
-
-  @@index([partyId])
-}
-
-model BankAccount {
-  id String @id @default(uuid())
-
-  partyId String
-  party   Party  @relation(fields: [partyId], references: [id], onDelete: Cascade)
-
-  bankName String
-
-  iban String @unique
-
-  cardNumber String?
-
-  ownerName String
-
-  createdAt DateTime @default(now())
-
-  @@index([partyId])
-}
-
-model Case {
-  id String @id @default(uuid())
-
-  caseNumber String @unique
-
-  applicantPartyId String
-  applicant        Party  @relation(fields: [applicantPartyId], references: [id])
-
-  title       String
-  description String?
-
-  status CaseStatus @default(DRAFT)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  caseDocuments CaseDocument[]
-  audits        CaseAudit[]
-
-  @@index([caseNumber])
-  @@index([status])
-  @@index([applicantPartyId])
-}
-
-model CaseDocument {
-  id String @id @default(uuid())
-
-  caseId String
-  case   Case   @relation(fields: [caseId], references: [id], onDelete: Cascade)
-
-  type  CaseDocumentType
-  title String
-
-  status CaseDocumentStatus @default(REQUIRED)
-
-  filePath        String?
-  rejectionReason String?
-
-  uploadedAt DateTime?
-  verifiedAt DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  audits CaseAudit[]
-
-  @@unique([caseId, type])
-  @@index([caseId])
-  @@index([status])
-}
-
-model CaseAudit {
-  id String @id @default(uuid())
-
-  caseId String
-  case   Case   @relation(fields: [caseId], references: [id], onDelete: Cascade)
-
-  action CaseAuditAction
-
-  fromStatus CaseStatus?
-  toStatus   CaseStatus?
-
-  documentId String?
-  document   CaseDocument? @relation(fields: [documentId], references: [id], onDelete: SetNull)
-
-  description String?
-
-  metadata Json?
-
-  createdAt DateTime @default(now())
-
-  @@index([caseId])
-  @@index([action])
-  @@index([documentId])
-  @@index([createdAt])
 }

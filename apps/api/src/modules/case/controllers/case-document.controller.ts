@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 
 import { CaseDocumentService } from '../services/case-document.service';
+
 import { CreateCaseDocumentDto } from '../dto/create-case-document.dto';
 import { UpdateCaseDocumentDto } from '../dto/update-case-document.dto';
 
@@ -31,6 +32,21 @@ export class CaseDocumentController {
     @Param('caseId') caseId: string,
   ) {
     return this.service.findAllByCaseId(caseId);
+  }
+
+  @Get(':id')
+  findOne(
+    @Param('id') id: string,
+  ) {
+    return this.service.findOne(id);
+  }
+
+  @Patch(':id')
+  update(
+    @Param('id') id: string,
+    @Body() dto: UpdateCaseDocumentDto,
+  ) {
+    return this.service.update(id, dto);
   }
 
   @Post(':id/upload')
@@ -60,21 +76,6 @@ export class CaseDocumentController {
       id,
       body.rejectionReason,
     );
-  }
-
-  @Get(':id')
-  findOne(
-    @Param('id') id: string,
-  ) {
-    return this.service.findOne(id);
-  }
-
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() dto: UpdateCaseDocumentDto,
-  ) {
-    return this.service.update(id, dto);
   }
 
   @Delete(':id')

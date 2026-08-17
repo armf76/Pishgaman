@@ -115,17 +115,9 @@ export class CaseDocumentRepository {
         ...(dto.type !== undefined && {
           type: dto.type,
         }),
+
         ...(dto.title !== undefined && {
           title: dto.title,
-        }),
-        ...(dto.status !== undefined && {
-          status: dto.status,
-        }),
-        ...(dto.filePath !== undefined && {
-          filePath: dto.filePath,
-        }),
-        ...(dto.rejectionReason !== undefined && {
-          rejectionReason: dto.rejectionReason,
         }),
       },
     });
